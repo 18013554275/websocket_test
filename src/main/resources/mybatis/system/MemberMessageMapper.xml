@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberMessageMapper">
+	<resultMap type="MemberMessage" id="memberMessageResultMap">
+		<id column="id" property="id"/>
+		<result column="receiver_id" property="receiverId"/>
+		<result column="receiver_role" property="receiverRole"/>
+		<result column="sender_id" property="senderId"/>
+		<result column="sender_role" property="senderRole"/>
+		<result column="type" property="type"/>
+		<result column="classify" property="classify"/>
+		<result column="content" property="content"/>
+	</resultMap>
+	
+	<!-- 新增-->
+	<insert id="save" parameterType="MemberMessage">
+		insert into sys_member_message(
+		    receiver_id,
+		    receiver_role,
+		    sender_id,
+		    sender_role,
+		    type,
+		    classify,
+		    content
+		) values (
+		    #{receiverId},
+		    #{receiverRole},
+		    #{sendererId},
+		    #{sendererRole},
+		    #{type},
+		    #{classify},
+		    #{content}
+		)
+
+	</insert>
+	
+	<!-- 删除-->
+	<delete id="delete" parameterType="java.lang.Long">
+		delete from sys_member_message
+		where 
+			id = #{value}
+	</delete>
+
+	<!-- 修改 -->
+	<update id="update" parameterType="MemberMessage">
+		update sys_member_message
+			set 
+			<if test="receiverId!=null">
+				receiver_id = #{receiverIdId},
+			</if>
+			<if test="receiverRole!=null">
+				receiver_role = #{receiverRole},
+			</if>
+			<if test="type!=null and type != ''">
+				type = #{type},
+			</if>
+		    <if test="classify != null and classify != ''">
+				classify = #{classify},
+		    </if>
+			where 
+				id = #{id}
+	</update>
+	
+	
+	<!-- 通过id获取数据 -->
+	<select id="findById" parameterType="java.lang.Long" resultMap="memberMessageResultMap">
+		select * from 
+			sys_member_message
+		where 
+			id = #{value}
+	</select>
+
+	
+	<!-- 列表(全部) -->
+	<select id="listAll" parameterType="String" resultMap="memberMessageResultMap">
+		select * from sys_member_message a
+	</select>
+
+</mapper>

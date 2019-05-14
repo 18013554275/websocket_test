@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>在线聊天测试</title>
+</head>
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script>
+    var webSocket = null;
+    $(function(){
+        connectWebSocket(1, 1);
+    })
+    function connectWebSocket(role, id) {
+        var url = window.location.href;
+        var wsUrl = url.substring("http://".length, url.lastIndexOf("/"));
+        if ('WebSocket' in window) {
+            var ws = 'ws://' + wsUrl + '/monitor/' + role + '/' + id;
+            webSocket = new WebSocket(ws);
+
+        } else {
+            alert('Not support websocket');
+            return;
+        }
+
+        webSocket.onerror = function(event) {
+            onError(event);
+        };
+
+        webSocket.onopen = function(event) {
+            onOpen(event);
+        };
+
+        webSocket.onmessage = function(event) {
+            onMessage(event);
+        };
+    }
+
+    function onOpen(){
+
+    }
+
+    function onMessage(msg){
+        var msgObj = JSON.parse(msg.data);
+        var contentHtml = '<div>${name}:</div>\n' +
+            '    <div>${content}</div>';
+        contentHtml = contentHtml.replace("${name}", msgObj.id);
+        contentHtml = contentHtml.replace("${content}",msgObj.content.substring(1,msgObj.content.length-1));
+        console.log(contentHtml);
+        $("#content-list").append(contentHtml);
+
+    }
+
+    function onError(){
+
+    }
+
+</script>
+<body>
+<div class = "content-list" id = "content-list" style="height: 250px; overflow: scroll;">
+    <div>张三：</div>
+    <div>今天是星期一。</div>
+</div>
+<input type = "text" id = "content">
+<input type = "button" value="发送" onclick="sendMessage(1,1);">
+
+
+</body>
+<script>
+    function sendMessage(receiverRole, receiverId){
+        var msg = $("#content").val();
+        var msgMap = {
+            "receiverRole": receiverRole,
+            "receiverId": receiverId,
+            "senderRole": 1,
+            "senderId": 2,
+            "type":"personal",
+            "classify": "text",
+            "content": msg
+        }
+        webSocket.send(JSON.stringify(msgMap));
+    }
+
+</script>
+</html>
